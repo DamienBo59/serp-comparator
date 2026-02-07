@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SERP Comparator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a' },
+                        dark: { 700:'#334155',800:'#1e293b',900:'#0f172a' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-dark-900 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center font-bold text-lg">S</div>
+                <div>
+                    <h1 class="text-xl font-bold">SERP Comparator</h1>
+                    <p class="text-gray-400 text-xs">Comparez les SERPs Google et analysez la cannibalisation</p>
+                </div>
+            </div>
+            <button id="btn-settings" class="flex items-center gap-2 bg-dark-700 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span class="hidden sm:inline">Cl&eacute; API</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- API Key Modal -->
+    <div id="modal-api-key" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 mx-4 w-full max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-gray-900">Configuration de la cl&eacute; API</h2>
+                <button id="btn-close-modal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <p class="text-sm text-gray-500 mb-4">
+                Entrez votre cl&eacute; <a href="https://serpapi.com/" target="_blank" class="text-primary-600 underline">SerpApi</a> pour effectuer les recherches.
+                La cl&eacute; est stock&eacute;e localement dans votre navigateur.
+            </p>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Cl&eacute; API SerpApi</label>
+                <input id="input-api-key" type="password" placeholder="Votre cl&eacute; SerpApi..."
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+            </div>
+            <div class="flex items-center gap-2 mb-4">
+                <button id="btn-toggle-key-visibility" class="text-xs text-gray-500 hover:text-gray-700 underline">Afficher la cl&eacute;</button>
+                <span class="text-gray-300">|</span>
+                <button id="btn-clear-key" class="text-xs text-red-500 hover:text-red-700 underline">Supprimer la cl&eacute;</button>
+            </div>
+            <div id="key-status" class="text-sm mb-4"></div>
+            <button id="btn-save-key" class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition-colors">
+                Sauvegarder
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+        <!-- Search Form -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+            <h2 class="text-lg font-bold text-gray-900 mb-4">Comparer les SERPs</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mot-cl&eacute; 1 <span class="text-red-500">*</span></label>
+                    <input id="kw1" type="text" placeholder="Ex: proteine whey"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mot-cl&eacute; 2 <span class="text-red-500">*</span></label>
+                    <input id="kw2" type="text" placeholder="Ex: whey isolate"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mot-cl&eacute; 3 <span class="text-gray-400">(optionnel)</span></label>
+                    <input id="kw3" type="text" placeholder="Ex: meilleure whey"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pays</label>
+                    <select id="select-country" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <option value="fr" selected>France</option>
+                        <option value="us">USA</option>
+                        <option value="gb">Royaume-Uni</option>
+                        <option value="de">Allemagne</option>
+                        <option value="es">Espagne</option>
+                        <option value="it">Italie</option>
+                        <option value="be">Belgique</option>
+                        <option value="ch">Suisse</option>
+                        <option value="ca">Canada</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Langue</label>
+                    <select id="select-language" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <option value="fr" selected>Fran&ccedil;ais</option>
+                        <option value="en">Anglais</option>
+                        <option value="de">Allemand</option>
+                        <option value="es">Espagnol</option>
+                        <option value="it">Italien</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Domaines exclus</label>
+                    <input id="excluded-domains" type="text" placeholder="amazon.fr, wikipedia.org"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                </div>
+            </div>
+
+            <button id="btn-compare" class="w-full sm:w-auto bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                Comparer les SERPs
+            </button>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden">
+            <div class="flex flex-col items-center justify-center py-16">
+                <div class="loader mb-4"></div>
+                <p class="text-gray-500 text-sm">Analyse des SERPs en cours...</p>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div id="error-box" class="hidden bg-red-50 border border-red-200 rounded-xl p-4 mb-8">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p id="error-message" class="text-red-700 text-sm"></p>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="results" class="hidden">
+
+            <!-- Summary Cards -->
+            <div id="summary-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"></div>
+
+            <!-- Cannibalization Alert -->
+            <div id="cannibalization-box" class="mb-8"></div>
+
+            <!-- Pivot Page -->
+            <div id="pivot-box" class="mb-8"></div>
+
+            <!-- Tabs -->
+            <div class="border-b border-gray-200 mb-6">
+                <nav class="flex gap-1 -mb-px overflow-x-auto" id="tabs-nav">
+                    <button class="tab-btn active" data-tab="serps">SERPs</button>
+                    <button class="tab-btn" data-tab="titles">Titles</button>
+                    <button class="tab-btn" data-tab="snippets">Snippets</button>
+                    <button class="tab-btn" data-tab="links">Liens</button>
+                    <button class="tab-btn" data-tab="words">Mots communs</button>
+                </nav>
+            </div>
+
+            <!-- Tab: SERPs side by side -->
+            <div id="tab-serps" class="tab-content active">
+                <div id="serps-grid" class="grid gap-6"></div>
+            </div>
+
+            <!-- Tab: Title comparison -->
+            <div id="tab-titles" class="tab-content hidden">
+                <div id="titles-list"></div>
+            </div>
+
+            <!-- Tab: Snippet comparison -->
+            <div id="tab-snippets" class="tab-content hidden">
+                <div id="snippets-list"></div>
+            </div>
+
+            <!-- Tab: Links -->
+            <div id="tab-links" class="tab-content hidden">
+                <div id="links-section"></div>
+            </div>
+
+            <!-- Tab: Common words -->
+            <div id="tab-words" class="tab-content hidden">
+                <div id="words-section"></div>
+            </div>
+
+            <!-- Export -->
+            <div class="mt-8 flex justify-end">
+                <button id="btn-export" class="flex items-center gap-2 bg-dark-800 hover:bg-dark-700 text-white px-6 py-2 rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Exporter CSV
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-gray-400 text-xs">
+        SERP Comparator &mdash; Powered by SerpApi
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
