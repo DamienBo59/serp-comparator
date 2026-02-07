@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SERP Comparator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     <script>
         tailwind.config = {
             theme: {
@@ -49,7 +49,7 @@
             </div>
             <p class="text-sm text-gray-500 mb-4">
                 Entrez votre cl&eacute; <a href="https://serpapi.com/" target="_blank" class="text-primary-600 underline">SerpApi</a> pour effectuer les recherches.
-                La cl&eacute; est stock&eacute;e localement dans votre navigateur.
+                La cl&eacute; est stock&eacute;e uniquement dans votre navigateur (localStorage).
             </p>
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Cl&eacute; API SerpApi</label>
@@ -57,7 +57,7 @@
                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
             </div>
             <div class="flex items-center gap-2 mb-4">
-                <button id="btn-toggle-key-visibility" class="text-xs text-gray-500 hover:text-gray-700 underline">Afficher la cl&eacute;</button>
+                <button id="btn-toggle-key-visibility" class="text-xs text-gray-500 hover:text-gray-700 underline">Afficher</button>
                 <span class="text-gray-300">|</span>
                 <button id="btn-clear-key" class="text-xs text-red-500 hover:text-red-700 underline">Supprimer la cl&eacute;</button>
             </div>
@@ -210,6 +210,6 @@
         SERP Comparator &mdash; Powered by SerpApi
     </footer>
 
-    <script src="/static/js/app.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
