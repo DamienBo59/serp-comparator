@@ -1,0 +1,82 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "serp-comparator",
+  "title": "SERP Comparator",
+  "description": "Compare Google SERPs for 2-3 keywords and analyze cannibalization, pivot pages, title/snippet variations, and common words",
+  "icon": "icon.png",
+  "author": "DamienBo59",
+  "categories": ["Web", "Productivity"],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "compare-serps",
+      "title": "Compare SERPs",
+      "description": "Compare Google search results for multiple keywords",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "apiKey",
+      "title": "SerpApi API Key",
+      "description": "Your SerpApi.com API key for fetching Google search results",
+      "type": "password",
+      "required": true
+    },
+    {
+      "name": "defaultCountry",
+      "title": "Default Country",
+      "description": "Default country for Google search",
+      "type": "dropdown",
+      "required": false,
+      "default": "fr",
+      "data": [
+        { "title": "France", "value": "fr" },
+        { "title": "USA", "value": "us" },
+        { "title": "United Kingdom", "value": "gb" },
+        { "title": "Germany", "value": "de" },
+        { "title": "Spain", "value": "es" },
+        { "title": "Italy", "value": "it" },
+        { "title": "Belgium", "value": "be" },
+        { "title": "Switzerland", "value": "ch" },
+        { "title": "Canada", "value": "ca" }
+      ]
+    },
+    {
+      "name": "defaultLanguage",
+      "title": "Default Language",
+      "description": "Default language for Google search",
+      "type": "dropdown",
+      "required": false,
+      "default": "fr",
+      "data": [
+        { "title": "French", "value": "fr" },
+        { "title": "English", "value": "en" },
+        { "title": "German", "value": "de" },
+        { "title": "Spanish", "value": "es" },
+        { "title": "Italian", "value": "it" }
+      ]
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.83.0",
+    "@raycast/utils": "^1.17.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.11",
+    "@types/node": "22.10.2",
+    "@types/react": "18.3.18",
+    "eslint": "^8.57.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "prepublishOnly": "echo \"Error: no publish\" && exit 1",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}
